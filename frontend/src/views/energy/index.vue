@@ -76,6 +76,7 @@ import { computed, onMounted, ref } from 'vue'
 import {
   downloadEntries,
   listEntries,
+  moduleStats,
   moduleMeta,
   runAction as applyAction,
 } from '@/api/local-service'
@@ -85,7 +86,11 @@ const meta = moduleMeta('energy')
 const columns = ["计量编号", "计量点位", "用电量", "用水量", "统计周期", "抄表人员", "抄表日期", "计量状态"]
 const actions = ["提交抄表", "确认核对", "标记异常"]
 const statuses = ["待抄表", "已抄表", "已核对", "数据异常"]
-const stats = [{"label": "待抄表点位", "value": 0}, {"label": "已核对点位", "value": 0}, {"label": "数据异常点位", "value": 0}]
+const stats = computed(() => {
+  void rows.value
+  void total.value
+  return moduleStats(meta.key)
+})
 
 const rows = ref<EntryRow[]>([])
 const total = ref(0)
@@ -105,7 +110,7 @@ function resetFilters() {
 }
 
 function exportRows() {
-  downloadEntries(meta.key)
+  downloadEntries(meta.key, filters.value)
 }
 
 function openCreate() {

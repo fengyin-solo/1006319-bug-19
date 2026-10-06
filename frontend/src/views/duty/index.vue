@@ -76,6 +76,7 @@ import { computed, onMounted, ref } from 'vue'
 import {
   downloadEntries,
   listEntries,
+  moduleStats,
   moduleMeta,
   runAction as applyAction,
 } from '@/api/local-service'
@@ -85,7 +86,11 @@ const meta = moduleMeta('duty')
 const columns = ["交接编号", "值班班组", "值班日期", "班次", "值班人员", "交接事项", "交接人员", "交接状态"]
 const actions = ["发起交接", "确认交接", "登记遗留"]
 const statuses = ["待交接", "交接中", "已交接", "有遗留"]
-const stats = [{"label": "待交接班次", "value": 0}, {"label": "已交接班次", "value": 0}, {"label": "有遗留事项", "value": 0}]
+const stats = computed(() => {
+  void rows.value
+  void total.value
+  return moduleStats(meta.key)
+})
 
 const rows = ref<EntryRow[]>([])
 const total = ref(0)
@@ -105,7 +110,7 @@ function resetFilters() {
 }
 
 function exportRows() {
-  downloadEntries(meta.key)
+  downloadEntries(meta.key, filters.value)
 }
 
 function openCreate() {

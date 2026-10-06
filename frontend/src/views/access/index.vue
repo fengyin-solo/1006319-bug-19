@@ -76,6 +76,7 @@ import { computed, onMounted, ref } from 'vue'
 import {
   downloadEntries,
   listEntries,
+  moduleStats,
   moduleMeta,
   runAction as applyAction,
 } from '@/api/local-service'
@@ -85,7 +86,11 @@ const meta = moduleMeta('access')
 const columns = ["点位编号", "所属出入口", "门禁类型", "监控覆盖", "授权人数", "检查日期", "检查人员", "安防状态"]
 const actions = ["提交检查", "判定正常", "提出整改"]
 const statuses = ["待检查", "检查中", "状态正常", "需整改"]
-const stats = [{"label": "待检查点位", "value": 0}, {"label": "状态正常点位", "value": 0}, {"label": "需整改点位", "value": 0}]
+const stats = computed(() => {
+  void rows.value
+  void total.value
+  return moduleStats(meta.key)
+})
 
 const rows = ref<EntryRow[]>([])
 const total = ref(0)
@@ -105,7 +110,7 @@ function resetFilters() {
 }
 
 function exportRows() {
-  downloadEntries(meta.key)
+  downloadEntries(meta.key, filters.value)
 }
 
 function openCreate() {

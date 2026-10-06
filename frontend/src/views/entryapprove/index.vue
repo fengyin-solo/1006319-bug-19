@@ -76,6 +76,7 @@ import { computed, onMounted, ref } from 'vue'
 import {
   downloadEntries,
   listEntries,
+  moduleStats,
   moduleMeta,
   runAction as applyAction,
 } from '@/api/local-service'
@@ -85,7 +86,11 @@ const meta = moduleMeta('entryapprove')
 const columns = ["申请编号", "申请单位", "作业舱室", "作业类型", "作业人数", "安全措施", "审批人员", "审批状态"]
 const actions = ["提交审批", "确认批准", "驳回申请"]
 const statuses = ["待审批", "已批准", "已驳回", "已完工"]
-const stats = [{"label": "待审批申请", "value": 0}, {"label": "已批准申请", "value": 0}, {"label": "已驳回申请", "value": 0}]
+const stats = computed(() => {
+  void rows.value
+  void total.value
+  return moduleStats(meta.key)
+})
 
 const rows = ref<EntryRow[]>([])
 const total = ref(0)
@@ -105,7 +110,7 @@ function resetFilters() {
 }
 
 function exportRows() {
-  downloadEntries(meta.key)
+  downloadEntries(meta.key, filters.value)
 }
 
 function openCreate() {

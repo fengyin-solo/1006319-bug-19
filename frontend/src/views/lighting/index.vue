@@ -76,6 +76,7 @@ import { computed, onMounted, ref } from 'vue'
 import {
   downloadEntries,
   listEntries,
+  moduleStats,
   moduleMeta,
   runAction as applyAction,
 } from '@/api/local-service'
@@ -85,7 +86,11 @@ const meta = moduleMeta('lighting')
 const columns = ["灯具编号", "所属舱室", "灯具类型", "安装位置", "额定功率", "巡检日期", "巡检人员", "照明状态"]
 const actions = ["提交巡检", "判定正常", "登记损坏"]
 const statuses = ["待巡检", "巡检中", "照明正常", "已损坏"]
-const stats = [{"label": "待巡检灯具", "value": 0}, {"label": "照明正常灯具", "value": 0}, {"label": "已损坏灯具", "value": 0}]
+const stats = computed(() => {
+  void rows.value
+  void total.value
+  return moduleStats(meta.key)
+})
 
 const rows = ref<EntryRow[]>([])
 const total = ref(0)
@@ -105,7 +110,7 @@ function resetFilters() {
 }
 
 function exportRows() {
-  downloadEntries(meta.key)
+  downloadEntries(meta.key, filters.value)
 }
 
 function openCreate() {

@@ -76,6 +76,7 @@ import { computed, onMounted, ref } from 'vue'
 import {
   downloadEntries,
   listEntries,
+  moduleStats,
   moduleMeta,
   runAction as applyAction,
 } from '@/api/local-service'
@@ -85,7 +86,11 @@ const meta = moduleMeta('ventilation')
 const columns = ["机组编号", "所属舱室", "风机型号", "运行模式", "送风风速", "启停时间", "操作人员", "风机状态"]
 const actions = ["提交开机", "登记停机", "上报故障"]
 const statuses = ["待开机", "运行中", "已停机", "故障停机"]
-const stats = [{"label": "运行中风机", "value": 0}, {"label": "已停机风机", "value": 0}, {"label": "故障停机风机", "value": 0}]
+const stats = computed(() => {
+  void rows.value
+  void total.value
+  return moduleStats(meta.key)
+})
 
 const rows = ref<EntryRow[]>([])
 const total = ref(0)
@@ -105,7 +110,7 @@ function resetFilters() {
 }
 
 function exportRows() {
-  downloadEntries(meta.key)
+  downloadEntries(meta.key, filters.value)
 }
 
 function openCreate() {

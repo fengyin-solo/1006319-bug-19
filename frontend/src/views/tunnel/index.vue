@@ -76,6 +76,7 @@ import { computed, onMounted, ref } from 'vue'
 import {
   downloadEntries,
   listEntries,
+  moduleStats,
   moduleMeta,
   runAction as applyAction,
 } from '@/api/local-service'
@@ -85,7 +86,11 @@ const meta = moduleMeta('tunnel')
 const columns = ["管廊编号", "管廊名称", "所属片区", "舱室数量", "总长度", "结构类型", "投运日期", "管廊状态"]
 const actions = ["提交投运", "安排检修", "停用管廊"]
 const statuses = ["待投运", "运行中", "检修中", "已停用"]
-const stats = [{"label": "运行中管廊", "value": 0}, {"label": "检修中管廊", "value": 0}, {"label": "待投运管廊", "value": 0}]
+const stats = computed(() => {
+  void rows.value
+  void total.value
+  return moduleStats(meta.key)
+})
 
 const rows = ref<EntryRow[]>([])
 const total = ref(0)
@@ -105,7 +110,7 @@ function resetFilters() {
 }
 
 function exportRows() {
-  downloadEntries(meta.key)
+  downloadEntries(meta.key, filters.value)
 }
 
 function openCreate() {

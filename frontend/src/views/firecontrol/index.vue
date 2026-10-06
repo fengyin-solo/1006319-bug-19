@@ -76,6 +76,7 @@ import { computed, onMounted, ref } from 'vue'
 import {
   downloadEntries,
   listEntries,
+  moduleStats,
   moduleMeta,
   runAction as applyAction,
 } from '@/api/local-service'
@@ -85,7 +86,11 @@ const meta = moduleMeta('firecontrol')
 const columns = ["设施编号", "所属舱室", "消防类型", "探测器数量", "联动测试日", "责任人员", "下次检测日", "消防状态"]
 const actions = ["提交检测", "判定正常", "提出维修"]
 const statuses = ["待检测", "检测中", "状态正常", "需维修"]
-const stats = [{"label": "待检测设施", "value": 0}, {"label": "状态正常设施", "value": 0}, {"label": "需维修设施", "value": 0}]
+const stats = computed(() => {
+  void rows.value
+  void total.value
+  return moduleStats(meta.key)
+})
 
 const rows = ref<EntryRow[]>([])
 const total = ref(0)
@@ -105,7 +110,7 @@ function resetFilters() {
 }
 
 function exportRows() {
-  downloadEntries(meta.key)
+  downloadEntries(meta.key, filters.value)
 }
 
 function openCreate() {

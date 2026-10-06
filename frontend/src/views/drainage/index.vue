@@ -76,6 +76,7 @@ import { computed, onMounted, ref } from 'vue'
 import {
   downloadEntries,
   listEntries,
+  moduleStats,
   moduleMeta,
   runAction as applyAction,
 } from '@/api/local-service'
@@ -85,7 +86,11 @@ const meta = moduleMeta('drainage')
 const columns = ["泵坑编号", "所属舱室", "集水坑容积", "当前水位", "启泵水位", "排水泵编号", "值班人员", "排水状态"]
 const actions = ["启动排水", "确认正常", "上报故障"]
 const statuses = ["待排水", "排水中", "水位正常", "水泵故障"]
-const stats = [{"label": "待排水泵坑", "value": 0}, {"label": "排水中泵坑", "value": 0}, {"label": "水泵故障数", "value": 0}]
+const stats = computed(() => {
+  void rows.value
+  void total.value
+  return moduleStats(meta.key)
+})
 
 const rows = ref<EntryRow[]>([])
 const total = ref(0)
@@ -105,7 +110,7 @@ function resetFilters() {
 }
 
 function exportRows() {
-  downloadEntries(meta.key)
+  downloadEntries(meta.key, filters.value)
 }
 
 function openCreate() {

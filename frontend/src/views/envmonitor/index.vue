@@ -76,6 +76,7 @@ import { computed, onMounted, ref } from 'vue'
 import {
   downloadEntries,
   listEntries,
+  moduleStats,
   moduleMeta,
   runAction as applyAction,
 } from '@/api/local-service'
@@ -85,7 +86,11 @@ const meta = moduleMeta('envmonitor')
 const columns = ["监测编号", "监测点位", "环境温度", "空气湿度", "氧气浓度", "有害气体浓度", "采集时间", "监测状态"]
 const actions = ["提交采集", "判定正常", "标记超标"]
 const statuses = ["待采集", "已采集", "指标正常", "指标超标"]
-const stats = [{"label": "待采集点位", "value": 0}, {"label": "指标正常点位", "value": 0}, {"label": "指标超标点位", "value": 0}]
+const stats = computed(() => {
+  void rows.value
+  void total.value
+  return moduleStats(meta.key)
+})
 
 const rows = ref<EntryRow[]>([])
 const total = ref(0)
@@ -105,7 +110,7 @@ function resetFilters() {
 }
 
 function exportRows() {
-  downloadEntries(meta.key)
+  downloadEntries(meta.key, filters.value)
 }
 
 function openCreate() {

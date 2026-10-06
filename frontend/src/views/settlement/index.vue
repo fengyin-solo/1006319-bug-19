@@ -76,6 +76,7 @@ import { computed, onMounted, ref } from 'vue'
 import {
   downloadEntries,
   listEntries,
+  moduleStats,
   moduleMeta,
   runAction as applyAction,
 } from '@/api/local-service'
@@ -85,7 +86,11 @@ const meta = moduleMeta('settlement')
 const columns = ["监测编号", "监测断面", "累计沉降量", "沉降速率", "预警阈值", "监测日期", "监测人员", "监测状态"]
 const actions = ["提交监测", "判定正常", "标记预警"]
 const statuses = ["待监测", "监测中", "沉降正常", "超限预警"]
-const stats = [{"label": "待监测断面", "value": 0}, {"label": "沉降正常断面", "value": 0}, {"label": "超限预警断面", "value": 0}]
+const stats = computed(() => {
+  void rows.value
+  void total.value
+  return moduleStats(meta.key)
+})
 
 const rows = ref<EntryRow[]>([])
 const total = ref(0)
@@ -105,7 +110,7 @@ function resetFilters() {
 }
 
 function exportRows() {
-  downloadEntries(meta.key)
+  downloadEntries(meta.key, filters.value)
 }
 
 function openCreate() {
