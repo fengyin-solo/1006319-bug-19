@@ -77,21 +77,24 @@ import {
   downloadEntries,
   listEntries,
   moduleMeta,
+  moduleStats,
   runAction as applyAction,
 } from '@/api/local-service'
+import { useSessionStore } from '@/stores/session'
 import type { EntryRow } from '@/data/types'
 
 const meta = moduleMeta('tunnel')
 const columns = ["管廊编号", "管廊名称", "所属片区", "舱室数量", "总长度", "结构类型", "投运日期", "管廊状态"]
 const actions = ["提交投运", "安排检修", "停用管廊"]
 const statuses = ["待投运", "运行中", "检修中", "已停用"]
-const stats = [{"label": "运行中管廊", "value": 0}, {"label": "检修中管廊", "value": 0}, {"label": "待投运管廊", "value": 0}]
+const stats = ref<{ label: string; value: number }[]>([])
 
 const rows = ref<EntryRow[]>([])
 const total = ref(0)
 const errorMessage = ref('')
 const filters = ref<Record<string, string>>({})
 const filterFields = columns.slice(0, 3)
+const session = useSessionStore()
 const statusSummary = computed(() =>
   statuses.map((status: string) => ({
     status,
@@ -105,7 +108,7 @@ function resetFilters() {
 }
 
 function exportRows() {
-  downloadEntries(meta.key)
+  downloadEntries(meta.key, { filters: filters.value })
 }
 
 function openCreate() {
@@ -114,7 +117,10 @@ function openCreate() {
 
 function runAction(action: string, row: EntryRow) {
   errorMessage.value = ''
-  const result = applyAction(meta.key, Number(row.id), action)
+  const result = applyAction(meta.key, Number(row.id), action, {
+    operator: session.operator,
+    shift: session.shiftLabel,
+  })
   if (!result.ok) {
     errorMessage.value = result.message
     return
@@ -125,7 +131,8 @@ function runAction(action: string, row: EntryRow) {
 function reload() {
   errorMessage.value = ''
   try {
-    const payload = listEntries(meta.key, filters.value)
+    stats.value = moduleStats(meta.key)
+    const payload = listEntries(meta.key, { filters: filters.value })
     rows.value = payload.items
     total.value = payload.total
   } catch (error) {

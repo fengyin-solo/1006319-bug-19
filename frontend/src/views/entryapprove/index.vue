@@ -77,21 +77,24 @@ import {
   downloadEntries,
   listEntries,
   moduleMeta,
+  moduleStats,
   runAction as applyAction,
 } from '@/api/local-service'
+import { useSessionStore } from '@/stores/session'
 import type { EntryRow } from '@/data/types'
 
 const meta = moduleMeta('entryapprove')
 const columns = ["申请编号", "申请单位", "作业舱室", "作业类型", "作业人数", "安全措施", "审批人员", "审批状态"]
 const actions = ["提交审批", "确认批准", "驳回申请"]
 const statuses = ["待审批", "已批准", "已驳回", "已完工"]
-const stats = [{"label": "待审批申请", "value": 0}, {"label": "已批准申请", "value": 0}, {"label": "已驳回申请", "value": 0}]
+const stats = ref<{ label: string; value: number }[]>([])
 
 const rows = ref<EntryRow[]>([])
 const total = ref(0)
 const errorMessage = ref('')
 const filters = ref<Record<string, string>>({})
 const filterFields = columns.slice(0, 3)
+const session = useSessionStore()
 const statusSummary = computed(() =>
   statuses.map((status: string) => ({
     status,
@@ -105,7 +108,7 @@ function resetFilters() {
 }
 
 function exportRows() {
-  downloadEntries(meta.key)
+  downloadEntries(meta.key, { filters: filters.value })
 }
 
 function openCreate() {
@@ -114,7 +117,10 @@ function openCreate() {
 
 function runAction(action: string, row: EntryRow) {
   errorMessage.value = ''
-  const result = applyAction(meta.key, Number(row.id), action)
+  const result = applyAction(meta.key, Number(row.id), action, {
+    operator: session.operator,
+    shift: session.shiftLabel,
+  })
   if (!result.ok) {
     errorMessage.value = result.message
     return
@@ -125,7 +131,8 @@ function runAction(action: string, row: EntryRow) {
 function reload() {
   errorMessage.value = ''
   try {
-    const payload = listEntries(meta.key, filters.value)
+    stats.value = moduleStats(meta.key)
+    const payload = listEntries(meta.key, { filters: filters.value })
     rows.value = payload.items
     total.value = payload.total
   } catch (error) {

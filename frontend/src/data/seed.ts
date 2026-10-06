@@ -1,7 +1,19 @@
 import type { EntryRow } from './types'
 
+// 示例数据保持旧版结构（登记要素在首次加载时由 local-store 迁移补齐并归档）。
+type SeedRow = {
+  id: number
+  status: string
+  pending: boolean
+  abnormal: boolean
+  rev?: number
+  registeredAt?: string
+  remark?: string
+  [field: string]: string | number | boolean | undefined
+}
+
 // 示例数据：首次打开时播种，之后浏览器里的改动优先，重置才会回到这份。
-export const SEED_ROWS: Record<string, EntryRow[]> = {
+export const SEED_ROWS: Record<string, SeedRow[]> = {
   "tunnel": [
     {
       "id": 1,
